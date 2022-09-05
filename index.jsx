@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import {BrowserRouter, Routes, Route, Link, useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 const root = ReactDOM.createRoot(document.getElementById("app"));
 
@@ -31,7 +31,20 @@ function FrontPage(){
 
 }
 
-function ListMovies({movies}){
+function ListMovies({movieApi}){
+
+    const [movies, setMovies] = useState();
+
+    useEffect( async () => {
+        console.log("use effect is called! yey!");
+        setMovies(undefined);
+        setMovies(await movieApi.listMovies());
+        }, []);
+
+    if(!movies){
+        return <div> Loading... </div>
+    }
+
     return(
         <div>
             <h1> Listing all Movies </h1>
@@ -49,7 +62,7 @@ function ListMovies({movies}){
     )
 }
 
-function AddMovie({onAddMovie}){
+function AddMovie({movieApi}){
     const [title, setTitle] = useState("");
     const [year, setYear] = useState("");
     const [synopsis, setSynopsis] = useState("");
@@ -58,8 +71,7 @@ function AddMovie({onAddMovie}){
 
     function handleSubmit(e){
         e.preventDefault();
-        onAddMovie({title, year, synopsis});
-        console.log(MOVIES);
+        movieApi.onAddMovie({title, year, synopsis});
         navigate("/");
     }
 
@@ -81,11 +93,17 @@ function AddMovie({onAddMovie}){
 }
 
 function Application(){
+
+    const movieApi = {
+        onAddMovie: async (m) => MOVIES.push(m),
+        listMovies: async () => MOVIES
+    }
+
     return <BrowserRouter>
         <Routes>
             <Route path="/" element={<FrontPage/>}></Route>
-            <Route path="/movies" element={<ListMovies movies={MOVIES}/>}></Route>
-            <Route path="/movies/new" element={<AddMovie onAddMovie={m => MOVIES.push(m)}/>}></Route>
+            <Route path="/movies" element={<ListMovies movieApi={movieApi}/>}></Route>
+            <Route path="/movies/new" element={<AddMovie movieApi={movieApi}/>}></Route>
         </Routes>
     </BrowserRouter>
 }
