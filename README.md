@@ -4,7 +4,7 @@
 * [x] Routing in React
 * [x] List movies
 * [x] Add new items using form and state
-* [ ] Move data source to back end
-* [ ] Use express to have a server
-* [ ] Use a basic API to handle data
+* [x] Move data source to back end
+* [x] Use express to have a server
+* [x] Use a basic API to handle data
 * [ ] Deploy

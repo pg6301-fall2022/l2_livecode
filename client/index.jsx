@@ -5,21 +5,6 @@ import {useEffect, useState} from "react";
 
 const root = ReactDOM.createRoot(document.getElementById("app"));
 
-const MOVIES = [
-    {
-        title: "Plan 9 from outer space",
-        year: 1957,
-        synopsis: "A complete mess, but Bela Lugosi is in it"
-    },
-    {
-        title: "Dune",
-        year: 2021,
-        synopsis: "The spice must flow."
-    }
-];
-
-
-
 function FrontPage(){
     return <div>
             <h1> Lecture 2 - Livecoded Movies </h1>
@@ -52,7 +37,7 @@ function ListMovies({movieApi}){
                 movies.map( m =>
                     <>
                         <h2> {m.title} - {m.year}</h2>
-                        <div>
+                        <div key={m.title}>
                             {m.synopsis}
                         </div>
                     </>
@@ -69,9 +54,9 @@ function AddMovie({movieApi}){
 
     const navigate = useNavigate();
 
-    function handleSubmit(e){
+    async function handleSubmit(e){
         e.preventDefault();
-        movieApi.onAddMovie({title, year, synopsis});
+        await movieApi.onAddMovie({title, year, synopsis});
         navigate("/");
     }
 
@@ -95,8 +80,19 @@ function AddMovie({movieApi}){
 function Application(){
 
     const movieApi = {
-        onAddMovie: async (m) => MOVIES.push(m),
-        listMovies: async () => MOVIES
+        onAddMovie: async (m) => {
+            await fetch("/api/movies", {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json"
+                },
+                body: JSON.stringify(m)
+            })
+        },
+        listMovies: async () => {
+            const res = await fetch("/api/movies");
+            return res.json();
+        }
     }
 
     return <BrowserRouter>
